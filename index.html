@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forge d’Étoiles</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3effc;--bg2:#e4dcfa;--panel:rgba(255,255,255,.78);--line:#cfc4ee;--tx:#1e1840;--mut:#6a6490;--gold:#b07a00;--goldbg:#fff0c2;--vio:#6a4fe0;--teal:#0f8f78;--bad:#c23b2b;--star:90,70,200;--glow:rgba(176,122,0,.25);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c0a22;--bg2:#1a1545;--panel:rgba(31,26,72,.72);--line:#3b3470;--tx:#f1ecff;--mut:#a9a3d0;--gold:#ffcf5c;--goldbg:#3b3014;--vio:#9d8cff;--teal:#5ee0c0;--bad:#ff8c7c;--star:255,244,214;--glow:rgba(255,207,92,.35);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0c0a22;--bg2:#1a1545;--panel:rgba(31,26,72,.72);--line:#3b3470;--tx:#f1ecff;--mut:#a9a3d0;--gold:#ffcf5c;--goldbg:#3b3014;--vio:#9d8cff;--teal:#5ee0c0;--bad:#ff8c7c;--star:255,244,214;--glow:rgba(255,207,92,.35);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--tx);background:radial-gradient(120% 80% at 50% -10%,var(--bg2),var(--bg) 60%);font:16px/1.5 "DM Sans",system-ui,sans-serif;overflow-x:hidden}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+h1,h2,h3,.num{font-family:Fraunces,Georgia,serif}
+h2{margin:0 0 10px;font-size:1.3rem}
+button,input,textarea{font:inherit;color:inherit}
+button{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;transition:border-color .15s,transform .1s}
+button:hover:not(:disabled){border-color:var(--gold)}
+button:active:not(:disabled){transform:scale(.97)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.pri{background:linear-gradient(135deg,var(--vio),var(--gold));border:0;color:#14102e;font-weight:700}
+:is(button,input,textarea,a):focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+input,textarea{background:color-mix(in srgb,var(--bg) 70%,transparent);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:14px}
+.hide{display:none!important}
+.card{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:18px;padding:16px}
+.mut{color:var(--mut)}
+.err{color:var(--bad);min-height:1.4em;font-size:.9rem}
+.tag{font-size:.72rem;border-radius:6px;padding:1px 7px;background:var(--goldbg);color:var(--gold);white-space:nowrap}
+.load{text-align:center;margin-top:30vh}
+.login{max-width:400px;margin:9vh auto 0}
+.login h1{font-size:2.6rem;line-height:1.05;margin:0 0 6px}
+.grid{display:grid;gap:10px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
+.seg .on,.tabs .on{background:var(--goldbg);border-color:var(--gold);font-weight:700}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.ann{background:linear-gradient(90deg,var(--goldbg),transparent);border-left:3px solid var(--gold);padding:8px 12px;border-radius:8px;margin-bottom:12px}
+.app{display:grid;gap:14px}
+@media(min-width:900px){.app{grid-template-columns:340px 1fr;align-items:start}.left{position:sticky;top:12px}}
+.hero{text-align:center}
+.big{font-size:clamp(2.4rem,9vw,3.4rem);font-weight:700;line-height:1.1;text-shadow:0 0 28px var(--glow)}
+#star{position:relative;display:block;margin:18px auto 8px;width:min(62vw,220px);aspect-ratio:1;border-radius:50%;border:0;padding:0;font-size:5.2rem;line-height:1;background:radial-gradient(circle at 35% 30%,var(--goldbg),var(--panel) 70%);box-shadow:0 0 50px var(--glow),inset 0 0 30px var(--glow);user-select:none;-webkit-user-select:none;touch-action:manipulation}
+#star::before{content:"";position:absolute;inset:-6px;border-radius:50%;background:conic-gradient(from 0deg,var(--gold),var(--vio),var(--teal),var(--gold));-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#000 calc(100% - 2px));animation:spin 12s linear infinite}
+#star.hit{animation:hit .15s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes hit{50%{transform:scale(.93)}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:thin}
+.tabs button{white-space:nowrap;flex:none}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+.item b{display:block}.item small{color:var(--mut)}
+.item .ico{font-size:1.6rem;margin-right:10px}
+.item>div:first-child{display:flex;align-items:center;min-width:0}
+.item button{flex:none;min-width:92px}
+.sub{font-size:.8rem;color:var(--mut);margin:14px 0 2px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}
+tr.me td{background:var(--goldbg)}
+.cols{display:grid;gap:12px}
+@media(min-width:760px){.cols{grid-template-columns:1fr 1fr}}
+.ok{color:var(--teal)}
+.fx{position:fixed;pointer-events:none;z-index:20;font-weight:700;color:var(--gold);animation:up .9s ease-out forwards;text-shadow:0 0 8px var(--glow)}
+.sp{position:fixed;pointer-events:none;z-index:20;width:6px;height:6px;border-radius:50%;background:var(--gold);animation:sp .6s ease-out forwards}
+@keyframes up{to{transform:translateY(-80px);opacity:0}}
+@keyframes sp{to{transform:translate(var(--dx),var(--dy));opacity:0}}
+#gold{position:fixed;z-index:15;font-size:2.6rem;background:none;border:0;padding:0;filter:drop-shadow(0 0 14px var(--gold));animation:fly 12s linear forwards}
+@keyframes fly{from{transform:translateX(-10vw) rotate(-10deg)}to{transform:translateX(110vw) rotate(10deg)}}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:30;max-width:90vw}
+@media (prefers-reduced-motion:reduce){#star::before,#gold,.fx,.sp{animation:none}.fx,.sp{opacity:0}}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="wrap">
+
+<div id="load" class="load"><h1>Forge d’Étoiles</h1><p class="mut">Connexion au cosmos…</p></div>
+
+<section id="auth" class="login card hide">
+  <h1>Forge d’Étoiles</h1>
+  <p class="mut">Forge des étoiles, bâtis des univers, et laisse le temps filer.</p>
+  <div class="seg"><button id="tL" class="on">Connexion</button><button id="tR">Inscription</button></div>
+  <div class="grid">
+    <input id="lu" placeholder="Pseudo" autocomplete="username" maxlength="16">
+    <input id="lp" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    <button id="go" class="pri">Se connecter</button>
+    <div class="err" id="aerr"></div>
+    <div class="mut" id="amode" style="font-size:.85rem"></div>
+  </div>
+</section>
+
+<section id="game" class="hide">
+  <div class="bar">
+    <div><b id="who"></b> <span id="role" class="tag"></span> <span id="sync" class="tag"></span></div>
+    <div><button id="theme" aria-label="Changer le thème">◐</button> <button id="out">Déconnexion</button></div>
+  </div>
+  <div id="ann" class="ann hide"></div>
+  <div class="app">
+    <div class="left card hero">
+      <div class="mut">Étoiles</div>
+      <div class="big num" id="st">0</div>
+      <div class="mut"><span id="cps">0</span> étoiles/s</div>
+      <button id="star" aria-label="Forger une étoile">✦</button>
+      <div class="chips"><span class="tag" id="mul"></span><span class="tag hide" id="fr"></span></div>
+      <p class="mut" style="font-size:.85rem;margin:10px 0 0">Astuce : surveille le ciel, des étoiles filantes dorées passent parfois.</p>
+    </div>
+    <div>
+      <div class="tabs" id="tabs">
+        <button data-v="v-jeu" class="on">Forge</button>
+        <button data-v="v-asc">Ascension</button>
+        <button data-v="v-code">Codes</button>
+        <button data-v="v-suc">Succès</button>
+        <button data-v="v-top">Classement</button>
+        <button data-v="v-pro">Profil</button>
+        <button data-v="v-adm" id="tAdm" class="hide">Admin</button>
+      </div>
+
+      <div id="v-jeu" class="view card">
+        <div class="item"><div><span class="ico">🎁</span><div><b>Cadeau du jour</b><small id="dsub"></small></div></div><button id="daily">Récupérer</button></div>
+        <div class="sub">Production</div>
+        <div id="shop"></div>
+        <div class="sub">Améliorations</div>
+        <div id="ups"></div>
+      </div>
+
+      <div id="v-asc" class="view card hide">
+        <h2>Ascension</h2>
+        <p>Repars de zéro et gagne des <b>Éclats</b> : chacun donne +10 % de production, pour toujours.</p>
+        <p>Éclats : <b id="pts">0</b> · gain possible : <b id="gain">0</b> <span class="mut">(il faut 1 M d’étoiles forgées dans cette ascension)</span></p>
+        <button id="asc" class="pri">Ascensionner</button>
+      </div>
+
+      <div id="v-code" class="view card hide">
+        <h2>Codes cadeaux</h2>
+        <div style="display:flex;gap:8px"><input id="code" placeholder="Entre un code" maxlength="24"><button id="redeem" class="pri">Valider</button></div>
+        <p class="mut">Essaie BIENVENUE. D’autres codes circulent, et l’admin en crée régulièrement.</p>
+      </div>
+
+      <div id="v-suc" class="view card hide"><h2>Succès</h2><p class="mut">Chaque succès débloqué donne +5 % de production.</p><div id="ach"></div></div>
+
+      <div id="v-top" class="view card hide"><h2>Classement</h2><div class="scroll"><table id="lb"></table></div></div>
+
+      <div id="v-pro" class="view card hide">
+        <h2>Profil</h2>
+        <div id="stats" class="mut"></div>
+        <div class="sub">Changer de mot de passe</div>
+        <div style="display:flex;gap:8px"><input id="np" type="password" placeholder="Nouveau mot de passe" autocomplete="new-password"><button id="npb">Changer</button></div>
+        <div class="sub">Sauvegarde manuelle</div>
+        <textarea id="exp" rows="3" placeholder="Colle ici une sauvegarde pour l’importer"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px"><button id="ex">Exporter</button><button id="im">Importer</button></div>
+      </div>
+
+      <div id="v-adm" class="view hide">
+        <div class="cols">
+          <div class="card grid">
+            <h2>Admins</h2>
+            <div style="display:flex;gap:8px"><input id="pa" placeholder="Pseudo à promouvoir admin" maxlength="16"><button id="pab" class="pri">Promouvoir</button></div>
+            <small class="mut">Fonctionne même si le joueur n’a pas encore de compte : il sera admin dès son inscription. La promotion est appliquée en direct sur son appareil.</small>
+            <div id="pend"></div>
+            <h2 style="margin-top:8px">Annonce</h2>
+            <div style="display:flex;gap:8px"><input id="an" placeholder="Message pour tous les joueurs" maxlength="140"><button id="anb">Publier</button></div>
+            <h2 style="margin-top:8px">Boost global</h2>
+            <div style="display:flex;gap:8px"><input id="gm" type="number" min="1" max="1000" step="0.5"><button id="gmb">Appliquer</button></div>
+            <button id="gall">Offrir 5 min de production à tous</button>
+          </div>
+          <div class="card grid">
+            <h2>Créer un code</h2>
+            <input id="cn" placeholder="CODE" maxlength="24">
+            <input id="cr" type="number" placeholder="Récompense (étoiles)">
+            <input id="cm" type="number" placeholder="Utilisations max (0 = illimité)">
+            <button id="cb" class="pri">Créer le code</button>
+            <div class="scroll"><table id="ct"></table></div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px"><h2>Joueurs</h2><div class="scroll"><table id="ut"></table></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div id="toast" class="toast hide"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const SUF=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];
+function fmt(n){if(!isFinite(n))return "∞";if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();const e=Math.min(Math.floor(Math.log10(n)/3),SUF.length-1);return (n/Math.pow(10,e*3)).toFixed(2)+SUF[e]}
+function hash(s){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);h1=Math.imul(h1^c,2654435761);h2=Math.imul(h2^c,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return (4294967296*(2097151&h2)+(h1>>>0)).toString(36)}
+const H=(u,p)=>hash("forge2|"+u.toLowerCase()+"|"+p);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+function toast(t){const el=$("toast");el.textContent=t;el.classList.remove("hide");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add("hide"),2800)}
+
+/* ---------- Données ---------- */
+const GENS=[["✨","Lucioles",15,.1],["🏮","Lanternes",100,1],["🔭","Observatoires",1100,8],["🚀","Fusées",12000,47],["🌌","Nébuleuses",1.3e5,260],["🕳️","Trous noirs",1.4e6,1400],["🌀","Galaxies",2e7,7800],["🪐","Univers",3.3e8,44000],["♾️","Multivers",5.1e9,2.6e5],["⏳","Horloges du temps",7.5e10,1.6e6]];
+const UPS=[
+ ["gants","Gants dorés","Clics ×2",500],["atelier","Atelier d’étoiles","Production +25 %",1e4],["radar","Radar à comètes","Étoiles filantes 2× plus fréquentes",2.5e4],
+ ["marteau","Marteau cosmique","Clics ×3",5e4],["veille","Veilleur nocturne","Gains hors-ligne à 100 %",2.5e5],["reacteur","Réacteur stellaire","Production +50 %",1e6],
+ ["pulsar","Cœur de pulsar","Chaque clic ajoute 5 % de ta production/s",5e6],["matiere","Matière noire","Production +100 %",5e8]];
+const ACH=[["Première étincelle",s=>s.clicks>=1],["Doigts agiles (100 clics)",s=>s.clicks>=100],["Marathon (2 000 clics)",s=>s.clicks>=2000],["Millier d’étoiles",s=>s.total>=1e3],["Million d’étoiles",s=>s.total>=1e6],["Milliard d’étoiles",s=>s.total>=1e9],["Mille milliards",s=>s.total>=1e12],["Premier éclat",s=>s.pts>=1],["Dix éclats",s=>s.pts>=10],["Collectionneur de codes",s=>s.redeemed.length>=3],["Cent lanternes",s=>(s.gens[1]||0)>=100],["Un univers à toi",s=>(s.gens[7]||0)>=1],["Maître du temps",s=>(s.gens[9]||0)>=1],["Chasseur de comètes",s=>s.golds>=5],["Tout acheté",s=>s.ups.length>=UPS.length],["Fidèle (3 jours de suite)",s=>s.streak>=3]];
+const newSave=()=>({stars:0,run:0,total:0,clicks:0,gens:{},cl:0,ups:[],pts:0,redeemed:[],ach:[],t:Date.now(),daily:"",streak:0,golds:0,lastCmd:""});
+
+/* ---------- Stockage : base partagée si dispo, sinon local ---------- */
+const LK="fe2_db",SK="fe2_ses";
+let DB={users:{},codes:{},cfg:{mult:1,ann:"",admins:[],seeded:false}},rdb=null,me=null,seenSelf=false;
+const Q={};
+function load(){try{const d=JSON.parse(localStorage.getItem(LK));if(d&&d.users)DB=Object.assign(DB,d)}catch(e){}}
+function keep(){try{localStorage.setItem(LK,JSON.stringify(DB))}catch(e){}}
+function job(p,fn){Q[p]=(Q[p]||Promise.resolve()).then(fn).catch(e=>console.warn(p,e&&e.message||e))}
+const clone=o=>JSON.parse(JSON.stringify(o));
+function putUser(k){keep();if(rdb&&DB.users[k]){const o=clone(DB.users[k]);job("u"+k,()=>rdb.doc("users/"+k).set(o))}}
+function patchUser(k,p){const u=DB.users[k];if(!u)return;Object.assign(u,p);keep();if(rdb){const o=clone(p);job("u"+k,()=>rdb.doc("users/"+k).update(o))}}
+function delUser(k){delete DB.users[k];keep();if(rdb)job("u"+k,()=>rdb.doc("users/"+k).delete())}
+function putCode(k){keep();if(rdb&&DB.codes[k]){const o=clone(DB.codes[k]);job("c"+k,()=>rdb.doc("codes/"+k).set(o))}}
+function delCode(k){delete DB.codes[k];keep();if(rdb)job("c"+k,()=>rdb.doc("codes/"+k).delete())}
+function putCfg(){keep();if(rdb){const o=clone(DB.cfg);job("cfg",()=>rdb.doc("config/main").set(o))}}
+function saveMine(){if(!me||!DB.users[me])return;const s=S();s.t=Date.now();keep();if(rdb){const o=clone(s);job("u"+me,()=>rdb.doc("users/"+me).update({save:o}))}}
+function seed(){
+  if(!DB.users.admin){DB.users.admin={name:"admin",h:H("admin","admin123"),role:"admin",banned:false,created:Date.now(),save:newSave()};putUser("admin")}
+  if(!DB.cfg.seeded){DB.cfg.seeded=true;
+    [["BIENVENUE",1000,0],["TEMPS",50000,0],["COSMOS",2000000,20]].forEach(c=>{if(!DB.codes[c[0]]){DB.codes[c[0]]={reward:c[1],uses:0,max:c[2]};putCode(c[0])}});putCfg()}
+}
+const U=()=>DB.users[me],S=()=>DB.users[me].save,isAdmin=()=>!!me&&!!U()&&U().role==="admin";
+
+/* ---------- Auth ---------- */
+let mode="L";
+function setMode(m){mode=m;$("tL").classList.toggle("on",m=="L");$("tR").classList.toggle("on",m=="R");$("go").textContent=m=="L"?"Se connecter":"Créer le compte";$("aerr").textContent=""}
+$("tL").onclick=()=>setMode("L");$("tR").onclick=()=>setMode("R");
+$("go").onclick=()=>{
+  const u=$("lu").value.trim(),p=$("lp").value,k=u.toLowerCase(),e=$("aerr");
+  if(!/^[A-Za-z0-9_]{3,16}$/.test(u))return e.textContent="Pseudo : 3 à 16 lettres, chiffres ou _.";
+  if(p.length<4)return e.textContent="Mot de passe : 4 caractères minimum.";
+  const a=DB.users[k];
+  if(mode=="R"){
+    if(a)return e.textContent="Ce pseudo est déjà pris.";
+    const adm=DB.cfg.admins.includes(k);
+    DB.users[k]={name:u,h:H(u,p),role:adm?"admin":"joueur",banned:false,created:Date.now(),save:newSave()};
+    if(adm){DB.cfg.admins=DB.cfg.admins.filter(x=>x!==k);putCfg()}
+    putUser(k);login(k);
+  }else{
+    if(!a||a.h!==H(a.name,p))return e.textContent="Pseudo ou mot de passe incorrect.";
+    if(a.banned)return e.textContent="Ce compte est suspendu.";
+    login(k);
+  }
+};
+["lu","lp"].forEach(i=>$(i).addEventListener("keydown",e=>{if(e.key=="Enter")$("go").click()}));
+function login(k){
+  me=k;seenSelf=!!rdb&&false;try{localStorage.setItem(SK,k)}catch(e){}
+  const s=S();for(const f of Object.keys(newSave()))if(s[f]===undefined)s[f]=newSave()[f];
+  $("auth").classList.add("hide");$("game").classList.remove("hide");
+  const away=Math.min((Date.now()-s.t)/1000,8*3600);
+  if(away>30){const g=cps()*away*(s.ups.includes("veille")?1:.5);gain(g);if(g>=1)toast("Pendant ton absence : +"+fmt(g)+" étoiles")}
+  last=Date.now();
+  buildShop();show("v-jeu");applySelf();applyCmd();banner();saveMine();scheduleGold();
+}
+function logout(){saveMine();me=null;try{localStorage.removeItem(SK)}catch(e){}$("game").classList.add("hide");$("auth").classList.remove("hide");$("lp").value="";$("gold")&&$("gold").remove()}
+$("out").onclick=logout;
+function applySelf(){const u=U();if(!u)return;$("who").textContent=u.name;$("role").textContent=u.role;$("tAdm").classList.toggle("hide",u.role!=="admin");
+  if(u.role!=="admin"&&!$("v-adm").classList.contains("hide"))show("v-jeu");
+  $("sync").textContent=rdb?"☁ synchronisé":"▣ local"}
+function banner(){const a=DB.cfg.ann;$("ann").classList.toggle("hide",!a);$("ann").textContent=a||""}
+function applyCmd(){const u=U(),c=u&&u.cmd;if(!c||c.id===S().lastCmd)return;
+  if(c.type=="give"){gain(c.v);S().lastCmd=c.id;toast("Cadeau de l’admin : +"+fmt(c.v)+" étoiles")}
+  else if(c.type=="reset"){u.save=Object.assign(newSave(),{lastCmd:c.id});buildShop();toast("Ta progression a été remise à zéro par un admin")}
+  saveMine()}
+function onRemote(){ // appelé à chaque snapshot
+  if(!me)return;const u=U();
+  if(!u){if(seenSelf){toast("Ton compte a été supprimé");logout()}return}
+  seenSelf=true;
+  if(u.banned){toast("Compte suspendu par un admin");logout();return}
+  applySelf();applyCmd();banner();
+  const v=document.querySelector(".view:not(.hide)");if(v){if(v.id=="v-adm")renderAdmin();if(v.id=="v-top")renderTop()}
+}
+
+/* ---------- Calculs ---------- */
+let last=Date.now(),frenzyUntil=0;
+const fz=()=>Date.now()<frenzyUntil?7:1;
+const has=id=>S().ups.includes(id);
+const pm=()=>(1+.1*S().pts)*(1+.05*S().ach.length)*DB.cfg.mult;
+const gmul=i=>{const n=S().gens[i]||0;return Math.pow(2,[10,25,50,100,200,400].filter(x=>n>=x).length)};
+function cps(){if(!me||!U())return 0;const s=S();let t=0;GENS.forEach((g,i)=>t+=g[3]*(s.gens[i]||0)*gmul(i));
+  return t*pm()*(has("atelier")?1.25:1)*(has("reacteur")?1.5:1)*(has("matiere")?2:1)*fz()}
+const clickPow=()=>(1+S().cl)*(has("gants")?2:1)*(has("marteau")?3:1)*pm()*fz()+(has("pulsar")?cps()*.05:0);
+const gcost=i=>Math.ceil(GENS[i][2]*Math.pow(1.15,S().gens[i]||0));
+const ccost=()=>Math.ceil(50*Math.pow(2.2,S().cl));
+function gain(n){const s=S();s.stars+=n;s.run+=n;s.total+=n}
+
+/* ---------- Boutique ---------- */
+function buildShop(){
+  let h=`<div class="item"><div><span class="ico">🔨</span><div><b>Marteau stellaire <span class="tag" id="cl">niv. 0</span></b><small id="cld"></small></div></div><button id="cbuy">…</button></div>`;
+  GENS.forEach((g,i)=>h+=`<div class="item"><div><span class="ico">${g[0]}</span><div><b>${g[1]} <span class="tag" id="gn${i}">0</span> <span class="tag hide" id="gx${i}"></span></b><small>${fmt(g[3])} étoile/s chacun</small></div></div><button data-g="${i}" id="gb${i}">…</button></div>`);
+  $("shop").innerHTML=h;
+  $("ups").innerHTML=UPS.map(u=>`<div class="item" id="ur${u[0]}"><div><div><b>${u[1]}</b><small>${u[2]}</small></div></div><button data-u="${u[0]}" id="ub${u[0]}">…</button></div>`).join("");
+}
+$("shop").onclick=e=>{const b=e.target.closest("button");if(!b)return;const s=S();
+  if(b.id=="cbuy"){const c=ccost();if(s.stars>=c){s.stars-=c;s.cl++}}
+  else if(b.dataset.g!==undefined){const i=+b.dataset.g,c=gcost(i);if(s.stars>=c){s.stars-=c;s.gens[i]=(s.gens[i]||0)+1}}
+  render()};
+$("ups").onclick=e=>{const b=e.target.closest("button");if(!b)return;const u=UPS.find(x=>x[0]==b.dataset.u),s=S();
+  if(u&&!s.ups.includes(u[0])&&s.stars>=u[3]){s.stars-=u[3];s.ups.push(u[0]);toast(u[1]+" acheté");render()}};
+
+/* ---------- Clic, effets ---------- */
+$("star").onclick=e=>{
+  const p=clickPow();gain(p);S().clicks++;
+  const b=$("star");b.classList.remove("hit");void b.offsetWidth;b.classList.add("hit");
+  const x=e.clientX||innerWidth/2,y=e.clientY||300;
+  const d=document.createElement("div");d.className="fx";d.textContent="+"+fmt(p);d.style.left=x-14+"px";d.style.top=y-24+"px";document.body.appendChild(d);setTimeout(()=>d.remove(),900);
+  for(let i=0;i<5;i++){const a=rnd(0,6.28),r=rnd(30,70),sp=document.createElement("div");sp.className="sp";sp.style.left=x+"px";sp.style.top=y+"px";sp.style.setProperty("--dx",Math.cos(a)*r+"px");sp.style.setProperty("--dy",Math.sin(a)*r+"px");document.body.appendChild(sp);setTimeout(()=>sp.remove(),600)}
+};
+function scheduleGold(){clearTimeout(scheduleGold.t);if(!me)return;
+  scheduleGold.t=setTimeout(()=>{if(me&&!document.hidden&&!$("gold")){
+    const g=document.createElement("button");g.id="gold";g.textContent="🌠";g.setAttribute("aria-label","Étoile filante dorée");g.style.top=rnd(12,60)+"vh";
+    g.onclick=()=>{const f=Math.random()<.4;if(f){frenzyUntil=Date.now()+20000;toast("Frénésie ! Production et clics ×7 pendant 20 s")}else{const r=cps()*90+clickPow()*50;gain(r);toast("Étoile filante : +"+fmt(r)+" étoiles")}S().golds++;g.remove()};
+    document.body.appendChild(g);setTimeout(()=>g.remove(),12200)}
+    scheduleGold()},rnd(45,90)*1000/(me&&U()&&has("radar")?2:1))}
+
+/* ---------- Rendu ---------- */
+function render(){
+  if(!me||!U())return;const s=S(),f=Date.now()<frenzyUntil;
+  $("st").textContent=fmt(s.stars);$("cps").textContent=fmt(cps());
+  $("mul").textContent="Bonus ×"+(pm()*(DB.cfg.mult>1?1:1)).toFixed(2).replace(/\.?0+$/,"");
+  $("fr").classList.toggle("hide",!f);if(f)$("fr").textContent="Frénésie ×7 · "+Math.ceil((frenzyUntil-Date.now())/1000)+" s";
+  $("cl").textContent="niv. "+s.cl;$("cld").textContent="+"+fmt(clickPow()/(1+s.cl)*1)+" par clic de base";
+  $("cbuy").textContent=fmt(ccost())+" ✦";$("cbuy").disabled=s.stars<ccost();
+  GENS.forEach((g,i)=>{const b=$("gb"+i);if(!b)return;b.textContent=fmt(gcost(i))+" ✦";b.disabled=s.stars<gcost(i);$("gn"+i).textContent=s.gens[i]||0;const m=gmul(i),x=$("gx"+i);x.classList.toggle("hide",m<2);x.textContent="×"+m});
+  UPS.forEach(u=>{const r=$("ur"+u[0]);if(!r)return;const own=s.ups.includes(u[0]);r.classList.toggle("hide",own);const b=$("ub"+u[0]);b.textContent=fmt(u[3])+" ✦";b.disabled=s.stars<u[3]});
+  const td=new Date().toISOString().slice(0,10);$("daily").disabled=s.daily===td;
+  $("dsub").textContent=s.daily===td?"Reviens demain · série : "+s.streak+" jour(s)":"5 min de production, +10 % par jour de série (série : "+s.streak+")";
+  $("pts").textContent=s.pts;const gn=Math.floor(Math.sqrt(s.run/1e6));$("gain").textContent=gn;$("asc").disabled=gn<1;
+  ACH.forEach((a,i)=>{if(!s.ach.includes(i)&&a[1](s)){s.ach.push(i);toast("Succès : "+a[0]+" (+5 %)")}});
+}
+$("daily").onclick=()=>{const s=S(),td=new Date().toISOString().slice(0,10);if(s.daily===td)return;
+  const y=new Date(Date.now()-864e5).toISOString().slice(0,10);s.streak=s.daily===y?s.streak+1:1;s.daily=td;
+  const r=Math.max(cps()*300,500)*(1+Math.min(s.streak,10)*.1);gain(r);toast("Cadeau du jour : +"+fmt(r)+" étoiles");saveMine();render()};
+$("asc").onclick=()=>{const s=S(),g=Math.floor(Math.sqrt(s.run/1e6));if(g<1)return;
+  if(!confirm("Ascensionner pour gagner "+g+" éclat(s) ? Étoiles, producteurs et améliorations seront remis à zéro."))return;
+  s.pts+=g;s.stars=0;s.run=0;s.gens={};s.cl=0;s.ups=[];buildShop();saveMine();render();toast("Ascension réussie : +"+g+" éclats");show("v-jeu")};
+$("redeem").onclick=()=>{const c=$("code").value.trim().toUpperCase(),s=S(),d=DB.codes[c];$("code").value="";
+  if(!d)return toast("Code invalide.");
+  if(s.redeemed.includes(c))return toast("Code déjà utilisé sur ce compte.");
+  if(d.max&&d.uses>=d.max)return toast("Ce code n’a plus d’utilisations.");
+  d.uses++;s.redeemed.push(c);gain(d.reward);putCode(c);saveMine();render();toast("Code validé : +"+fmt(d.reward)+" étoiles")};
+$("code").addEventListener("keydown",e=>{if(e.key=="Enter")$("redeem").click()});
+
+function renderAch(){const s=S();$("ach").innerHTML=ACH.map((a,i)=>{const ok=s.ach.includes(i);return `<div class="item"><span class="${ok?"ok":"mut"}">${ok?"✓":"○"} ${a[0]}</span></div>`}).join("")}
+function renderTop(){const rows=Object.keys(DB.users).map(k=>DB.users[k]).filter(u=>!u.banned&&u.save).sort((a,b)=>b.save.total-a.save.total).slice(0,50);
+  $("lb").innerHTML="<tr><th>#</th><th>Joueur</th><th>Étoiles forgées</th><th>Éclats</th></tr>"+rows.map((u,i)=>`<tr class="${u.name.toLowerCase()==me?"me":""}"><td>${i+1}</td><td>${esc(u.name)} ${u.role=="admin"?'<span class="tag">admin</span>':""}</td><td>${fmt(u.save.total)}</td><td>${u.save.pts}</td></tr>`).join("")}
+function renderPro(){const s=S();$("stats").innerHTML=`Clics : <b>${fmt(s.clicks)}</b> · Étoiles forgées (total) : <b>${fmt(s.total)}</b> · Éclats : <b>${s.pts}</b> · Succès : <b>${s.ach.length}/${ACH.length}</b> · Étoiles filantes : <b>${s.golds}</b> · Compte créé le ${new Date(U().created).toLocaleDateString("fr-FR")}`}
+$("npb").onclick=()=>{const p=$("np").value;if(p.length<4)return toast("4 caractères minimum.");patchUser(me,{h:H(U().name,p)});$("np").value="";toast("Mot de passe changé")};
+$("ex").onclick=()=>{saveMine();$("exp").value=btoa(unescape(encodeURIComponent(JSON.stringify(S()))));$("exp").select();toast("Sauvegarde exportée : copie le texte")};
+$("im").onclick=()=>{try{const o=JSON.parse(decodeURIComponent(escape(atob($("exp").value.trim()))));if(typeof o.stars!="number")throw 0;U().save=Object.assign(newSave(),o);buildShop();saveMine();render();toast("Sauvegarde importée")}catch(e){toast("Sauvegarde invalide.")}};
+
+/* ---------- Navigation ---------- */
+function show(v){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("hide",x.id!=v));
+  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("on",b.dataset.v==v));
+  if(v=="v-suc")renderAch();if(v=="v-top")renderTop();if(v=="v-pro")renderPro();if(v=="v-adm")renderAdmin()}
+$("tabs").onclick=e=>{const b=e.target.closest("button");if(b)show(b.dataset.v)};
+$("theme").onclick=()=>{const r=document.documentElement,dark=matchMedia("(prefers-color-scheme:dark)").matches,cur=r.dataset.theme||(dark?"dark":"light");r.dataset.theme=cur=="dark"?"light":"dark";try{localStorage.setItem("fe2_th",r.dataset.theme)}catch(e){}starCol()};
+try{const t=localStorage.getItem("fe2_th");if(t)document.documentElement.dataset.theme=t}catch(e){}
+
+/* ---------- Admin ---------- */
+function renderAdmin(){
+  if(!isAdmin())return;if(document.activeElement!==$("gm"))$("gm").value=DB.cfg.mult;
+  $("pend").innerHTML=DB.cfg.admins.length?"<small class=\"mut\">En attente d’inscription :</small> "+DB.cfg.admins.map(a=>`<span class="tag">${esc(a)} <button data-a="unpend" data-k="${esc(a)}" style="padding:0 4px;border:0;background:none">×</button></span>`).join(" "):"";
+  $("ct").innerHTML="<tr><th>Code</th><th>Gain</th><th>Util.</th><th></th></tr>"+Object.keys(DB.codes).map(k=>{const c=DB.codes[k];return `<tr><td>${esc(k)}</td><td>${fmt(c.reward)}</td><td>${c.uses}/${c.max||"∞"}</td><td><button data-a="dc" data-k="${esc(k)}">Suppr.</button></td></tr>`}).join("");
+  $("ut").innerHTML="<tr><th>Joueur</th><th>Étoiles</th><th>Éclats</th><th>Actions</th></tr>"+Object.keys(DB.users).map(k=>{const u=DB.users[k],on=Date.now()-(u.save.t||0)<45000;return `<tr><td>${on?"🟢 ":""}${esc(u.name)} ${u.role=="admin"?'<span class="tag">admin</span>':""}${u.banned?'<span class="tag">suspendu</span>':""}</td><td>${fmt(u.save.stars)}</td><td>${u.save.pts}</td><td style="white-space:nowrap"><button data-a="give" data-k="${k}">+✦</button> <button data-a="ban" data-k="${k}">${u.banned?"Réactiver":"Suspendre"}</button> <button data-a="adm" data-k="${k}">${u.role=="admin"?"Retirer admin":"Admin"}</button> <button data-a="pw" data-k="${k}">MDP</button> <button data-a="rst" data-k="${k}">Reset</button> <button data-a="del" data-k="${k}">Suppr.</button></td></tr>`}).join("");
+}
+const cmd=(k,type,v)=>patchUser(k,{cmd:{id:Date.now()+"-"+Math.random().toString(36).slice(2,6),type,v:v||0}});
+$("pab").onclick=()=>{if(!isAdmin())return;const n=$("pa").value.trim().toLowerCase();if(!/^[a-z0-9_]{3,16}$/.test(n))return toast("Pseudo invalide.");
+  if(DB.users[n]){patchUser(n,{role:"admin"});toast(DB.users[n].name+" est maintenant admin")}
+  else{if(!DB.cfg.admins.includes(n))DB.cfg.admins.push(n);putCfg();toast(n+" sera admin dès son inscription")}$("pa").value="";renderAdmin()};
+$("anb").onclick=()=>{if(!isAdmin())return;DB.cfg.ann=$("an").value.trim();putCfg();banner();toast(DB.cfg.ann?"Annonce publiée":"Annonce retirée")};
+$("gmb").onclick=()=>{if(!isAdmin())return;const v=parseFloat($("gm").value);if(v>=1&&v<=1000){DB.cfg.mult=v;putCfg();toast("Boost global ×"+v)}else toast("Valeur entre 1 et 1000.")};
+$("gall").onclick=()=>{if(!isAdmin())return;if(!confirm("Offrir 5 min de production à tous les joueurs ?"))return;Object.keys(DB.users).forEach(k=>{const u=DB.users[k],c=k===me?cps():Math.max(u.save.total/5000,100);cmd(k,"give",c*300)});toast("Cadeau envoyé")};
+$("cb").onclick=()=>{if(!isAdmin())return;const n=$("cn").value.trim().toUpperCase(),r=parseFloat($("cr").value),m=parseInt($("cm").value)||0;
+  if(!/^[A-Z0-9_-]{3,24}$/.test(n)||!(r>0))return toast("Code (3-24 caractères) et récompense requis.");
+  DB.codes[n]={reward:r,uses:0,max:m};putCode(n);$("cn").value=$("cr").value=$("cm").value="";toast("Code créé : "+n);renderAdmin()};
+$("v-adm").onclick=e=>{const b=e.target.closest("button[data-a]");if(!b||!isAdmin())return;const a=b.dataset.a,k=b.dataset.k,u=DB.users[k];
+  if(a=="dc")delCode(k);
+  else if(a=="unpend"){DB.cfg.admins=DB.cfg.admins.filter(x=>x!==k);putCfg()}
+  else if(!u)return;
+  else if(a=="give"){const v=parseFloat(prompt("Étoiles à donner à "+u.name+" :","100000"));if(v>0)cmd(k,"give",v)}
+  else if(a=="pw"){const p=prompt("Nouveau mot de passe pour "+u.name+" :");if(p&&p.length>=4)patchUser(k,{h:H(u.name,p)});else if(p)return toast("4 caractères minimum.")}
+  else if(a=="rst"){if(confirm("Remettre "+u.name+" à zéro ?"))cmd(k,"reset")}
+  else if(k==me)return toast("Action impossible sur ton propre compte.");
+  else if(a=="ban")patchUser(k,{banned:!u.banned});
+  else if(a=="adm")patchUser(k,{role:u.role=="admin"?"joueur":"admin"});
+  else if(a=="del"){if(confirm("Supprimer "+u.name+" ?"))delUser(k)}
+  renderAdmin();render()};
+
+/* ---------- Boucle ---------- */
+setInterval(()=>{if(!me||!U())return;const n=Date.now(),dt=Math.min((n-last)/1000,5);last=n;gain(cps()*dt);render()},100);
+setInterval(()=>{if(me&&U())saveMine()},15000);
+addEventListener("beforeunload",()=>{if(me&&U())saveMine()});
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&me&&U())saveMine()});
+
+/* ---------- Ciel étoilé ---------- */
+const cv=$("sky"),cx=cv.getContext("2d"),still=matchMedia("(prefers-reduced-motion:reduce)").matches;let W=0,Hh=0,stars=[],col="255,244,214";
+function starCol(){col=getComputedStyle(document.documentElement).getPropertyValue("--star").trim()||col}
+function size(){W=cv.width=innerWidth;Hh=cv.height=innerHeight;stars=Array.from({length:Math.min(170,Math.floor(W*Hh/8000))},()=>({x:Math.random()*W,y:Math.random()*Hh,r:rnd(.3,1.6),p:rnd(0,6.28),s:rnd(.004,.02),v:rnd(.01,.06)}))}
+function sky(){cx.clearRect(0,0,W,Hh);for(const s of stars){s.p+=s.s;s.y-=s.v;if(s.y<-2){s.y=Hh+2;s.x=Math.random()*W}cx.fillStyle="rgba("+col+","+(.25+.55*Math.abs(Math.sin(s.p)))+")";cx.beginPath();cx.arc(s.x,s.y,s.r,0,6.283);cx.fill()}
+  if(!still&&!document.hidden)requestAnimationFrame(sky);else if(!still)setTimeout(()=>requestAnimationFrame(sky),500)}
+addEventListener("resize",()=>{size();if(still)sky()});size();starCol();sky();
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",()=>setTimeout(starCol,50));
+
+/* ---------- Démarrage ---------- */
+function start(){
+  $("load").classList.add("hide");
+  $("amode").textContent=rdb?"☁ Comptes synchronisés : ton compte fonctionne sur tous tes appareils.":"▣ Mode local : les comptes restent sur cet appareil (la synchronisation demande d’ouvrir la page connecté à claude.ai).";
+  let k=null;try{k=localStorage.getItem(SK)}catch(e){}
+  if(k&&DB.users[k]&&!DB.users[k].banned)login(k);else $("auth").classList.remove("hide");
+}
+(async function(){
+  load();
+  try{const c=window.claude&&claude.use?await Promise.race([claude.use("db"),new Promise(r=>setTimeout(()=>r(null),4000))]):null;rdb=c||null}catch(e){rdb=null}
+  if(!rdb){seed();keep();start();return}
+  const got={u:false,c:false,g:false};let done=false;
+  const go=()=>{if(done||!(got.u&&got.c&&got.g))return;done=true;seed();start()};
+  const bad=()=>{if(!done){done=true;rdb=null;seed();start()}};
+  rdb.collection("users").onSnapshot(s=>{const us={};s.docs.forEach(d=>{if(d.exists)us[d.id]=clone(d.data())});
+    if(me&&DB.users[me]&&us[me])us[me].save=DB.users[me].save;DB.users=us;keep();got.u=true;go();onRemote()},bad);
+  rdb.collection("codes").onSnapshot(s=>{const cs={};s.docs.forEach(d=>{if(d.exists)cs[d.id]=clone(d.data())});DB.codes=cs;keep();got.c=true;go()},bad);
+  rdb.doc("config/main").onSnapshot(d=>{DB.cfg=Object.assign({mult:1,ann:"",admins:[],seeded:false},d.exists?clone(d.data()):{});if(!Array.isArray(DB.cfg.admins))DB.cfg.admins=[];keep();got.g=true;go();if(me)banner()},bad);
+  setTimeout(()=>{if(!done){done=true;seed();start()}},8000);
+})();
+</script>
+</body>
+</html>
